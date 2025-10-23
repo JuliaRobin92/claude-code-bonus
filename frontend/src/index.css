@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Albert Heijn kleuren */
+  --ah-primary-blue: #00A1E0;
+  --ah-accent-blue: #0077B6;
+  --ah-bonus-orange: #FF7900;
+  --ah-white: #FFFFFF;
+  --ah-light-gray: #F5F5F5;
+  --ah-border-gray: #E0E0E0;
+  --ah-text-dark: #333333;
+  --ah-text-light: #666666;
+  --ah-success-green: #4CAF50;
+  --ah-error-red: #F44336;
+}
+
+body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--ah-light-gray);
+  color: var(--ah-text-dark);
+  line-height: 1.6;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ah-light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ah-primary-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ah-accent-blue);
+}
