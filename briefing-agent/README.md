@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-De applicatie draait op **http://localhost:3006**
+De applicatie draait op **http://localhost:3007**
 
 ---
 
@@ -220,7 +220,7 @@ briefing-agent/
 
 ## 🚀 Volgende stappen
 
-1. Open **http://localhost:3006**
+1. Open **http://localhost:3007**
 2. Beantwoord de 6 vragen
 3. Let op de realtime feedback
 4. Bekijk de interpretatie preview
@@ -242,5 +242,5 @@ briefing-agent/
 ---
 
 **Built with:** React, Vite, Vanilla CSS
-**Port:** 3006
+**Port:** 3007
 **Status:** Wave 2 – Prototype ready for testing
