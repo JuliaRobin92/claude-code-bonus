@@ -5,11 +5,13 @@ import BonusfolderUpload from './components/BonusfolderUpload';
 import UitingUpload from './components/UitingUpload';
 import ResultsTable from './components/ResultsTable';
 import LoadingSpinner from './components/LoadingSpinner';
+import BriefingWorkspace from './components/BriefingAgent/BriefingWorkspace';
 import './App.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 function App() {
+  const [view, setView] = useState('briefing'); // 'bonuscheck' or 'briefing'
   const [bonusfolderStatus, setBonusfolderStatus] = useState(null);
   const [comparisonResults, setComparisonResults] = useState(null);
   const [currentUitingName, setCurrentUitingName] = useState('');
@@ -91,9 +93,30 @@ function App() {
     setError(null);
   };
 
+  // Render Briefing Workspace view
+  if (view === 'briefing') {
+    return <BriefingWorkspace />;
+  }
+
+  // Render Bonuscheck view
   return (
     <div className="app">
       <Header />
+
+      <div className="view-switcher">
+        <button
+          className={`view-btn ${view === 'bonuscheck' ? 'active' : ''}`}
+          onClick={() => setView('bonuscheck')}
+        >
+          Bonuscheck
+        </button>
+        <button
+          className={`view-btn ${view === 'briefing' ? 'active' : ''}`}
+          onClick={() => setView('briefing')}
+        >
+          Briefing Agent
+        </button>
+      </div>
 
       <main className="container">
         {error && (
