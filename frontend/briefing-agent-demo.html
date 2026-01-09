@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briefing Agent - Prototype Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .demo-nav {
+      background: #1a2332;
+      color: white;
+      padding: 20px 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-nav h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .demo-nav p {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .demo-container {
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .demo-instructions {
+      background: #fffbeb;
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .demo-instructions h2 {
+      font-size: 18px;
+      color: #b45309;
+      margin-bottom: 12px;
+    }
+
+    .demo-instructions ul {
+      list-style: disc;
+      padding-left: 24px;
+      color: #78350f;
+    }
+
+    .demo-instructions li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .demo-frame {
+      border: 2px solid #e1e8ed;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      background: white;
+    }
+
+    .frame-header {
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-bottom: 1px solid #e1e8ed;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .frame-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+
+    iframe {
+      width: 100%;
+      height: calc(100vh - 240px);
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <h1>Briefing Agent Prototype - Demo Omgeving</h1>
+    <p>Frontend prototype voor functionele compleetheid check</p>
+  </nav>
+
+  <div class="demo-container">
+    <div class="demo-instructions">
+      <h2>Demo Instructies</h2>
+      <ul>
+        <li><strong>Test het prototype:</strong> Vul verschillende velden in om te zien hoe de statusen veranderen</li>
+        <li><strong>Verplichte secties:</strong> Zijn gemarkeerd met een rode "VERPLICHT" badge</li>
+        <li><strong>Voortgang:</strong> Wordt automatisch bijgewerkt in de header</li>
+        <li><strong>Verzendklaar status:</strong> Verschijnt onderaan wanneer alle verplichte velden zijn ingevuld</li>
+        <li><strong>Status indicatoren:</strong> Groen = compleet, Oranje = gedeeltelijk, Rood = incompleet</li>
+      </ul>
+    </div>
+
+    <div class="demo-frame">
+      <div class="frame-header">
+        <div class="frame-dot" style="background: #ef4444;"></div>
+        <div class="frame-dot" style="background: #f59e0b;"></div>
+        <div class="frame-dot" style="background: #10b981;"></div>
+      </div>
+      <iframe src="/src/briefing-demo.html"></iframe>
+    </div>
+  </div>
+</body>
+</html>
