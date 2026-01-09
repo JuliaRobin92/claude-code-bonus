@@ -10,7 +10,15 @@
     "start:backend": "npm start --prefix backend",
     "build:frontend": "npm run build --prefix frontend"
   },
-  "keywords": ["albert-heijn", "marketing", "bonus", "internal-tool"],
+  "keywords": [
+    "albert-heijn",
+    "marketing",
+    "bonus",
+    "internal-tool"
+  ],
   "author": "Albert Heijn IT Team",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "localtunnel": "^2.0.2"
+  }
 }
