@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Briefing Agent - Wave 1 Prototype</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+      min-height: 100vh;
+    }
+
+    /* Header Styles */
+    .briefing-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e1e8ed;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a2332;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      display: block;
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #64748b;
+    }
+
+    /* Progress Indicator */
+    .progress-indicator {
+      min-width: 300px;
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .progress-percentage {
+      font-size: 24px;
+      font-weight: 700;
+      color: #00ADE6;
+      letter-spacing: -0.5px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background: #e1e8ed;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ADE6 0%, #0095c9 100%);
+      border-radius: 24px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Main Content */
+    .briefing-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    .briefing-intro {
+      background: #ffffff;
+      border-left: 4px solid #00ADE6;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .briefing-intro p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #475569;
+    }
+
+    .briefing-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    /* Section Styles */
+    .briefing-section {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .briefing-section.complete {
+      border-color: #10b981;
+    }
+
+    .briefing-section.partial {
+      border-color: #f59e0b;
+    }
+
+    .briefing-section.incomplete {
+      border-color: #ef4444;
+    }
+
+    .briefing-section.optional {
+      border-color: #e1e8ed;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+
+    .section-header:hover {
+      background: #f8fafc;
+    }
+
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .section-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: #f1f5f9;
+      color: #64748b;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a2332;
+      letter-spacing: -0.3px;
+    }
+
+    .required-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .section-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-status {
+      font-size: 14px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .status-icon {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .status-icon.complete {
+      color: #10b981;
+    }
+
+    .status-icon.partial {
+      color: #f59e0b;
+    }
+
+    .status-icon.incomplete {
+      color: #ef4444;
+    }
+
+    .status-icon.optional {
+      color: #94a3b8;
+    }
+
+    .expand-icon {
+      width: 24px;
+      height: 24px;
+      color: #94a3b8;
+      transition: transform 0.3s ease;
+    }
+
+    .expand-icon.expanded {
+      transform: rotate(180deg);
+    }
+
+    /* Section Content */
+    .section-content {
+      padding: 0 28px 28px 28px;
+      border-top: 1px solid #f1f5f9;
+      display: none;
+    }
+
+    .section-content.expanded {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .missing-fields {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+
+    .missing-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #dc2626;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .missing-fields ul {
+      margin: 0;
+      padding-left: 20px;
+      list-style: disc;
+    }
+
+    .missing-fields li {
+      font-size: 14px;
+      color: #991b1b;
+      margin: 4px 0;
+    }
+
+    /* Fields */
+    .section-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      letter-spacing: -0.1px;
+    }
+
+    .required-asterisk {
+      color: #ef4444;
+      margin-left: 4px;
+      font-weight: 700;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #1a2332;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .field-input:focus {
+      outline: none;
+      border-color: #00ADE6;
+      box-shadow: 0 0 0 3px rgba(0, 173, 230, 0.1);
+    }
+
+    .field-input::placeholder {
+      color: #94a3b8;
+    }
+
+    textarea.field-input {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.6;
+    }
+
+    /* Completion Status */
+    .completion-status {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-top: 40px;
+      border: 3px solid;
+      transition: all 0.3s ease;
+    }
+
+    .completion-status.complete {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    }
+
+    .completion-status.incomplete {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+    }
+
+    .completion-icon {
+      flex-shrink: 0;
+    }
+
+    .completion-icon svg {
+      width: 64px;
+      height: 64px;
+    }
+
+    .completion-status.complete .completion-icon svg {
+      color: #10b981;
+      animation: checkPulse 2s ease infinite;
+    }
+
+    .completion-status.incomplete .completion-icon svg {
+      color: #f59e0b;
+    }
+
+    @keyframes checkPulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
+    }
+
+    .completion-content {
+      flex: 1;
+    }
+
+    .completion-title {
+      margin: 0 0 8px 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a2332;
+      letter-spacing: -0.5px;
+    }
+
+    .completion-status.complete .completion-title {
+      color: #047857;
+    }
+
+    .completion-status.incomplete .completion-title {
+      color: #b45309;
+    }
+
+    .completion-message {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #64748b;
+    }
+
+    .submit-button {
+      flex-shrink: 0;
+      padding: 16px 40px;
+      background: #00ADE6;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 173, 230, 0.3);
+      letter-spacing: -0.2px;
+    }
+
+    .submit-button:hover:not(:disabled) {
+      background: #0095c9;
+      box-shadow: 0 6px 16px rgba(0, 173, 230, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .submit-button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .submit-button:disabled {
+      background: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 24px 20px;
+      }
+
+      .briefing-main {
+        padding: 24px 20px;
+      }
+
+      .completion-status {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px 24px;
+        gap: 24px;
+      }
+
+      .submit-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // Briefing structure data
+    const BRIEFING_STRUCTURE = [
+      {
+        id: 'context',
+        title: 'Context & Achtergrond',
+        required: true,
+        fields: [
+          { id: 'situation', label: 'Huidige situatie', type: 'textarea', required: true },
+          { id: 'challenge', label: 'Uitdaging/Probleem', type: 'textarea', required: true },
+          { id: 'background', label: 'Relevante geschiedenis', type: 'textarea', required: false }
+        ]
+      },
+      {
+        id: 'objective',
+        title: 'Doel & Resultaat',
+        required: true,
+        fields: [
+          { id: 'goal', label: 'Wat moet er bereikt worden?', type: 'textarea', required: true },
+          { id: 'success', label: 'Hoe ziet succes eruit?', type: 'textarea', required: true },
+          { id: 'kpi', label: 'Meetbare indicatoren (KPI\'s)', type: 'textarea', required: true }
+        ]
+      },
+      {
+        id: 'audience',
+        title: 'Doelgroep',
+        required: true,
+        fields: [
+          { id: 'primary', label: 'Primaire doelgroep', type: 'textarea', required: true },
+          { id: 'secondary', label: 'Secundaire doelgroep', type: 'textarea', required: false },
+          { id: 'insights', label: 'Belangrijke inzichten over de doelgroep', type: 'textarea', required: true }
+        ]
+      },
+      {
+        id: 'message',
+        title: 'Boodschap & Tone of Voice',
+        required: true,
+        fields: [
+          { id: 'core', label: 'Kernboodschap', type: 'textarea', required: true },
+          { id: 'tone', label: 'Gewenste tone of voice', type: 'text', required: true },
+          { id: 'avoid', label: 'Wat moet vermeden worden?', type: 'textarea', required: false }
+        ]
+      },
+      {
+        id: 'deliverables',
+        title: 'Middelen & Deliverables',
+        required: true,
+        fields: [
+          { id: 'channels', label: 'Kanalen/Media', type: 'textarea', required: true },
+          { id: 'formats', label: 'Formats (bijv. video, banner, landingspagina)', type: 'textarea', required: true },
+          { id: 'quantity', label: 'Aantal deliverables', type: 'text', required: true }
+        ]
+      },
+      {
+        id: 'timing',
+        title: 'Planning & Timing',
+        required: true,
+        fields: [
+          { id: 'deadline', label: 'Uiterste opleverdatum', type: 'date', required: true },
+          { id: 'milestones', label: 'Tussentijdse mijlpalen', type: 'textarea', required: false },
+          { id: 'campaign', label: 'Campagneperiode/Live datum', type: 'text', required: true }
+        ]
+      },
+      {
+        id: 'constraints',
+        title: 'Randvoorwaarden & Budget',
+        required: true,
+        fields: [
+          { id: 'budget', label: 'Beschikbaar budget', type: 'text', required: true },
+          { id: 'legal', label: 'Juridische/compliance vereisten', type: 'textarea', required: false },
+          { id: 'technical', label: 'Technische beperkingen', type: 'textarea', required: false }
+        ]
+      },
+      {
+        id: 'stakeholders',
+        title: 'Stakeholders & Goedkeuring',
+        required: true,
+        fields: [
+          { id: 'owner', label: 'Briefing eigenaar', type: 'text', required: true },
+          { id: 'approvers', label: 'Wie moet goedkeuren?', type: 'textarea', required: true },
+          { id: 'contact', label: 'Contactpersoon voor vragen', type: 'text', required: true }
+        ]
+      },
+      {
+        id: 'assets',
+        title: 'Beschikbare Assets',
+        required: false,
+        fields: [
+          { id: 'existing', label: 'Bestaande content/materiaal', type: 'textarea', required: false },
+          { id: 'brand', label: 'Brand guidelines/huisstijl', type: 'textarea', required: false },
+          { id: 'references', label: 'Referenties/inspiratie', type: 'textarea', required: false }
+        ]
+      }
+    ];
+
+    // State
+    let briefingData = {};
+    let expandedSections = ['context'];
+
+    // Calculate section status
+    function getSectionStatus(section) {
+      const sectionData = briefingData[section.id] || {};
+      const requiredFields = section.fields.filter(f => f.required);
+      const optionalFields = section.fields.filter(f => !f.required);
+
+      const completedRequired = requiredFields.filter(f => {
+        const value = sectionData[f.id];
+        return value && value.toString().trim().length > 0;
+      }).length;
+
+      const completedOptional = optionalFields.filter(f => {
+        const value = sectionData[f.id];
+        return value && value.toString().trim().length > 0;
+      }).length;
+
+      const totalRequired = requiredFields.length;
+      const totalOptional = optionalFields.length;
+
+      if (totalRequired === 0) {
+        return {
+          status: totalOptional > 0 && completedOptional > 0 ? 'complete' : 'optional',
+          completedRequired,
+          totalRequired,
+          completedOptional,
+          totalOptional
+        };
+      }
+
+      if (completedRequired === totalRequired) {
+        return {
+          status: 'complete',
+          completedRequired,
+          totalRequired,
+          completedOptional,
+          totalOptional
+        };
+      } else if (completedRequired > 0) {
+        return {
+          status: 'partial',
+          completedRequired,
+          totalRequired,
+          completedOptional,
+          totalOptional
+        };
+      } else {
+        return {
+          status: 'incomplete',
+          completedRequired,
+          totalRequired,
+          completedOptional,
+          totalOptional
+        };
+      }
+    }
+
+    // Calculate overall progress
+    function getOverallStatus() {
+      const requiredSections = BRIEFING_STRUCTURE.filter(s => s.required);
+      const completedSections = requiredSections.filter(
+        s => getSectionStatus(s).status === 'complete'
+      ).length;
+
+      const percentage = Math.round((completedSections / requiredSections.length) * 100);
+      const isComplete = completedSections === requiredSections.length;
+
+      return {
+        completedSections,
+        totalSections: requiredSections.length,
+        percentage,
+        isComplete
+      };
+    }
+
+    // Update field
+    function updateField(sectionId, fieldId, value) {
+      if (!briefingData[sectionId]) {
+        briefingData[sectionId] = {};
+      }
+      briefingData[sectionId][fieldId] = value;
+      render();
+    }
+
+    // Toggle section
+    function toggleSection(sectionId) {
+      if (expandedSections.includes(sectionId)) {
+        expandedSections = expandedSections.filter(id => id !== sectionId);
+      } else {
+        expandedSections.push(sectionId);
+      }
+      render();
+    }
+
+    // Render
+    function render() {
+      const overallStatus = getOverallStatus();
+
+      const html = `
+        <div class="briefing-header">
+          <div class="header-content">
+            <div class="header-title">
+              <h1>Briefing Agent</h1>
+              <span class="header-subtitle">Functionele compleetheid check</span>
+            </div>
+            <div class="progress-indicator">
+              <div class="progress-stats">
+                <span class="progress-text">${overallStatus.completedSections} van ${overallStatus.totalSections} secties compleet</span>
+                <span class="progress-percentage">${overallStatus.percentage}%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: ${overallStatus.percentage}%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <main class="briefing-main">
+          <div class="briefing-intro">
+            <p>
+              Vul alle verplichte secties in om zekerheid te hebben dat deze briefing
+              functioneel compleet is voor verzending naar vervolgdisciplines.
+            </p>
+          </div>
+
+          <div class="briefing-sections">
+            ${BRIEFING_STRUCTURE.map((section, index) => renderSection(section, index)).join('')}
+          </div>
+
+          ${renderCompletionStatus(overallStatus)}
+        </main>
+      `;
+
+      document.getElementById('app').innerHTML = html;
+      attachEventListeners();
+    }
+
+    // Render section
+    function renderSection(section, index) {
+      const status = getSectionStatus(section);
+      const isExpanded = expandedSections.includes(section.id);
+      const sectionData = briefingData[section.id] || {};
+
+      const statusText = !section.required ? 'Optioneel' :
+        status.status === 'complete' ? 'Compleet' :
+        status.status === 'partial' ? `${status.completedRequired}/${status.totalRequired} verplicht` :
+        'Incompleet';
+
+      const statusIcon = status.status === 'complete'
+        ? '<svg class="status-icon complete" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke-width="2" stroke-linecap="round"/></svg>'
+        : status.status === 'partial'
+        ? '<svg class="status-icon partial" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>'
+        : status.status === 'optional'
+        ? '<svg class="status-icon optional" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2" stroke-dasharray="3 3"/></svg>'
+        : '<svg class="status-icon incomplete" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/></svg>';
+
+      const missingFields = section.required && status.status !== 'complete'
+        ? section.fields.filter(f => {
+            if (!f.required) return false;
+            const value = sectionData[f.id];
+            return !value || value.toString().trim().length === 0;
+          })
+        : [];
+
+      return `
+        <div class="briefing-section ${status.status}" data-section-id="${section.id}">
+          <div class="section-header" data-action="toggle-section" data-section-id="${section.id}">
+            <div class="section-header-left">
+              <span class="section-number">${index + 1}</span>
+              <h2 class="section-title">${section.title}</h2>
+              ${section.required ? '<span class="required-badge">Verplicht</span>' : ''}
+            </div>
+            <div class="section-header-right">
+              <span class="section-status">${statusText}</span>
+              ${statusIcon}
+              <svg class="expand-icon ${isExpanded ? 'expanded' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="section-content ${isExpanded ? 'expanded' : ''}">
+            ${missingFields.length > 0 ? `
+              <div class="missing-fields">
+                <span class="missing-label">Ontbrekende verplichte velden:</span>
+                <ul>
+                  ${missingFields.map(f => `<li>${f.label}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            <div class="section-fields">
+              ${section.fields.map(field => `
+                <div class="field-group">
+                  <label class="field-label">
+                    ${field.label}
+                    ${field.required ? '<span class="required-asterisk">*</span>' : ''}
+                  </label>
+                  ${field.type === 'textarea' ? `
+                    <textarea
+                      class="field-input"
+                      data-action="update-field"
+                      data-section-id="${section.id}"
+                      data-field-id="${field.id}"
+                      placeholder="Voer ${field.label.toLowerCase()} in..."
+                      rows="4"
+                    >${sectionData[field.id] || ''}</textarea>
+                  ` : `
+                    <input
+                      class="field-input"
+                      type="${field.type}"
+                      data-action="update-field"
+                      data-section-id="${section.id}"
+                      data-field-id="${field.id}"
+                      value="${sectionData[field.id] || ''}"
+                      placeholder="Voer ${field.label.toLowerCase()} in..."
+                    />
+                  `}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render completion status
+    function renderCompletionStatus(overallStatus) {
+      if (overallStatus.isComplete) {
+        return `
+          <div class="completion-status complete">
+            <div class="completion-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                <path d="M8 12l3 3 5-5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="completion-content">
+              <h3 class="completion-title">Briefing is verzendklaar</h3>
+              <p class="completion-message">
+                Alle verplichte secties zijn ingevuld. Deze briefing bevat voldoende
+                basisinformatie om mee verder te werken.
+              </p>
+            </div>
+            <button class="submit-button" data-action="submit">
+              Briefing verzenden
+            </button>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="completion-status incomplete">
+          <div class="completion-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="2"/>
+              <path d="M12 8v4M12 16h.01" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="completion-content">
+            <h3 class="completion-title">Briefing is nog niet compleet</h3>
+            <p class="completion-message">
+              Vul alle verplichte secties in om de briefing verzendklaar te maken.
+              Nog ${100 - overallStatus.percentage}% te gaan.
+            </p>
+          </div>
+          <button class="submit-button" disabled>
+            Briefing verzenden
+          </button>
+        </div>
+      `;
+    }
+
+    // Attach event listeners
+    function attachEventListeners() {
+      document.querySelectorAll('[data-action="toggle-section"]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          toggleSection(el.dataset.sectionId);
+        });
+      });
+
+      document.querySelectorAll('[data-action="update-field"]').forEach(el => {
+        el.addEventListener('input', (e) => {
+          updateField(el.dataset.sectionId, el.dataset.fieldId, e.target.value);
+        });
+      });
+
+      document.querySelectorAll('[data-action="submit"]').forEach(el => {
+        el.addEventListener('click', () => {
+          alert('Briefing verzonden! (Dit is een prototype - geen echte verzending)');
+        });
+      });
+    }
+
+    // Initialize
+    render();
+  </script>
+</body>
+</html>
